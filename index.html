@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, initial-scale=1" />
+
+<style>
+  body {
+    margin: 0;
+    width: 1080px;
+    height: 1920px;
+    font-family: Arial, sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Blurred background layer */
+  .bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(20px);
+    transform: scale(1.2);
+    z-index: 0;
+  }
+
+  /* Dark overlay for readability */
+  .bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 17, 21, 0.75);
+  }
+
+  /* Keep all content above background */
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .photo {
+    width: 920px;
+    height: 920px;
+    margin-top: 80px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 24px;
+    border: 6px solid #2a2d35;
+  }
+
+  .text {
+    margin-top: 36px;
+    font-size: 44px;
+    line-height: 1.25;
+    text-align: center;
+    padding: 0 90px;
+    letter-spacing: 0.2px;
+  }
+
+  .sub {
+    margin-top: 16px;
+    font-size: 34px;
+    opacity: 0.75;
+    text-align: center;
+    padding: 0 120px;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .deskneko {
+    font-size: 34px;
+    opacity: 0.6;
+    margin-bottom: 60px;
+  }
+
+  /* Floating "New post" badge */
+  .badge {
+    position: absolute;
+    top: 38px;
+    right: 46px;
+    padding: 14px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+  }
+
+  .badgeDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08);
+  }
+
+  .badgeText {
+    font-size: 28px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  /* Optional: if you want to use your own PNG badge instead of the CSS badge */
+  .badgeImg {
+    position: absolute;
+    top: 34px;
+    right: 40px;
+    width: 220px;   /* adjust */
+    height: auto;
+    display: none;  /* set to block when using a PNG */
+    z-index: 2;
+    filter: drop-shadow(0 18px 40px rgba(0,0,0,0.35));
+  }
+</style>
+
+<script>
+  function safeText(s, maxLen) {
+    if (!s) return "";
+    s = s.replace(/\s+/g, " ").trim();
+    if (s.length <= maxLen) return s;
+    const cut = s.slice(0, maxLen);
+    const p = Math.max(
+      cut.lastIndexOf("."),
+      cut.lastIndexOf("!"),
+      cut.lastIndexOf("?")
+    );
+    return (p > 80 ? cut.slice(0, p + 1) : cut) + "…";
+  }
+
+  window.onload = () => {
+    const p = new URLSearchParams(window.location.search);
+
+    // Only image from product image (query param)
+    const imageUrl = p.get("image_url") || "";
+
+    // Text pulled from your AI agent (query param)
+    const postText = safeText(p.get("text"), 420);
+
+    // Optional small subline if you want it (query param)
+    const subText = safeText(p.get("sub"), 120);
+
+    // Optional PNG badge (query param). If provided, it replaces the CSS badge.
+    const badgeUrl = p.get("badge_url") || "";
+
+    if (imageUrl) {
+      document.getElementById("photo").style.backgroundImage = `url('${imageUrl}')`;
+      document.getElementById("bg").style.backgroundImage    = `url('${imageUrl}')`;
+    }
+
+    document.getElementById("text").innerText = postText || "";
+    document.getElementById("sub").innerText  = subText || "";
+
+    if (badgeUrl) {
+      const img = document.getElementById("badgeImg");
+      img.src = badgeUrl;
+      img.style.display = "block";
+      document.getElementById("badge").style.display = "none";
+    }
+  };
+</script>
+</head>
+
+<body>
+  <div id="bg" class="bg"></div>
+
+  <!-- Default elegant floating badge (CSS) -->
+  <div id="badge" class="badge">
+    <div class="badgeDot"></div>
+    <div class="badgeText">New post</div>
+  </div>
+
+  <!-- Optional PNG badge (set via ?badge_url=...) -->
+  <img id="badgeImg" class="badgeImg" alt="New post badge" />
+
+  <div id="photo" class="photo"></div>
+
+  <div id="text" class="text"></div>
+  <div id="sub" class="sub"></div>
+
+  <div class="spacer"></div>
+
+  <div class="deskneko">@deskneko</div>
+</body>
+</html>
