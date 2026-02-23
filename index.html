@@ -26,7 +26,7 @@
   .bg {
     position: absolute;
     inset: 0;
-    background-image: url("{{IMAGE_URL}}");
+    /* background-image is set via JS */
     background-size: cover;
     background-position: center;
     filter: blur(20px);
@@ -81,7 +81,7 @@
     width: 920px;
     height: 920px;
     margin-top: 80px;
-    background-image: url("{{IMAGE_URL}}");
+    /* background-image is set via JS */
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -116,6 +116,7 @@
     text-align: center;
     padding: 0px 100px 30px 100px;
     opacity: 0.94;
+    white-space: pre-wrap; /* keeps line breaks if you pass them */
   }
 
   .cta {
@@ -143,6 +144,37 @@
     margin-bottom: 60px;
   }
 </style>
+
+<script>
+  function safeText(s, maxLen) {
+    if (!s) return "";
+    s = s.replace(/\s+/g, " ").trim();
+    if (s.length <= maxLen) return s;
+    const cut = s.slice(0, maxLen);
+    const p = Math.max(cut.lastIndexOf("."), cut.lastIndexOf("!"), cut.lastIndexOf("?"));
+    return (p > 80 ? cut.slice(0, p + 1) : cut) + "…";
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const p = new URLSearchParams(window.location.search);
+
+    const imageUrl = p.get("image_url") || "";
+    const textParam = p.get("text") || "";
+
+    // Apply image (both bg + main photo)
+    if (imageUrl) {
+      const url = imageUrl; // URLSearchParams already decodes; keep as-is
+      document.querySelector(".bg").style.backgroundImage = `url("${url}")`;
+      document.querySelector(".photo").style.backgroundImage = `url("${url}")`;
+    }
+
+    // Apply copy text
+    const copy = safeText(textParam, 520);
+    if (copy) {
+      document.getElementById("copy").innerText = copy;
+    }
+  });
+</script>
 </head>
 
 <body>
@@ -159,8 +191,8 @@
 <div class="copyWrap">
   <div class="newpost">New Post!</div>
 
-  <div class="copy">
-    {{text}}
+  <div id="copy" class="copy">
+    <!-- fallback text if no ?text= is provided -->
   </div>
 
   <div class="cta">
