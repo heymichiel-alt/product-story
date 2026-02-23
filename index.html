@@ -4,12 +4,15 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=1080, initial-scale=1" />
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
+
 <style>
   body {
     margin: 0;
     width: 1080px;
     height: 1920px;
-    font-family: Arial, sans-serif;
     color: white;
     display: flex;
     flex-direction: column;
@@ -17,21 +20,20 @@
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    background: #0f1115;
   }
 
-  /* Blurred background layer */
   .bg {
     position: absolute;
     inset: 0;
+    background-image: url("{{IMAGE_URL}}");
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     filter: blur(20px);
     transform: scale(1.2);
     z-index: 0;
   }
 
-  /* Dark overlay for readability */
   .bg::after {
     content: "";
     position: absolute;
@@ -39,16 +41,47 @@
     background: rgba(15, 17, 21, 0.75);
   }
 
-  /* Keep all content above background */
   body > * {
     position: relative;
     z-index: 1;
+  }
+
+  .badge {
+    position: absolute;
+    top: 38px;
+    right: 426px;
+    padding: 14px 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+  }
+
+  .badgeDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0.85;
+  }
+
+  .badgeText {
+    font-family: Inter, sans-serif;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.9;
   }
 
   .photo {
     width: 920px;
     height: 920px;
     margin-top: 80px;
+    background-image: url("{{IMAGE_URL}}");
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
@@ -56,21 +89,47 @@
     border: 6px solid #2a2d35;
   }
 
-  .text {
-    margin-top: 36px;
-    font-size: 44px;
-    line-height: 1.25;
-    text-align: center;
-    padding: 0 90px;
-    letter-spacing: 0.2px;
+  .copyWrap {
+    margin-top: 34px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .sub {
-    margin-top: 16px;
-    font-size: 34px;
-    opacity: 0.75;
+  .newpost {
+    font-family: "Goudy Bookletter 1911", serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 65px;
+    letter-spacing: 2px;
+    opacity: 0.88;
+    margin-bottom: 14px;
+  }
+
+  .copy {
+    font-family: "Crimson Text", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 42px;
+    line-height: 1.25;
     text-align: center;
-    padding: 0 120px;
+    padding: 0px 100px 30px 100px;
+    opacity: 0.94;
+  }
+
+  .cta {
+    margin-top: 22px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    font-size: 30px;
+    text-align: center;
+    padding: 16px 26px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+    opacity: 0.96;
   }
 
   .spacer {
@@ -78,123 +137,39 @@
   }
 
   .deskneko {
+    font-family: Inter, sans-serif;
     font-size: 34px;
     opacity: 0.6;
     margin-bottom: 60px;
   }
-
-  /* Floating "New post" badge */
-  .badge {
-    position: absolute;
-    top: 38px;
-    right: 46px;
-    padding: 14px 18px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.10);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 2;
-  }
-
-  .badgeDot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08);
-  }
-
-  .badgeText {
-    font-size: 28px;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    opacity: 0.9;
-  }
-
-  /* Optional: if you want to use your own PNG badge instead of the CSS badge */
-  .badgeImg {
-    position: absolute;
-    top: 34px;
-    right: 40px;
-    width: 220px;   /* adjust */
-    height: auto;
-    display: none;  /* set to block when using a PNG */
-    z-index: 2;
-    filter: drop-shadow(0 18px 40px rgba(0,0,0,0.35));
-  }
 </style>
-
-<script>
-  function safeText(s, maxLen) {
-    if (!s) return "";
-    s = s.replace(/\s+/g, " ").trim();
-    if (s.length <= maxLen) return s;
-    const cut = s.slice(0, maxLen);
-    const p = Math.max(
-      cut.lastIndexOf("."),
-      cut.lastIndexOf("!"),
-      cut.lastIndexOf("?")
-    );
-    return (p > 80 ? cut.slice(0, p + 1) : cut) + "…";
-  }
-
-  window.onload = () => {
-    const p = new URLSearchParams(window.location.search);
-
-    // Only image from product image (query param)
-    const imageUrl = p.get("image_url") || "";
-
-    // Text pulled from your AI agent (query param)
-    const postText = safeText(p.get("text"), 420);
-
-    // Optional small subline if you want it (query param)
-    const subText = safeText(p.get("sub"), 120);
-
-    // Optional PNG badge (query param). If provided, it replaces the CSS badge.
-    const badgeUrl = p.get("badge_url") || "";
-
-    if (imageUrl) {
-      document.getElementById("photo").style.backgroundImage = `url('${imageUrl}')`;
-      document.getElementById("bg").style.backgroundImage    = `url('${imageUrl}')`;
-    }
-
-    document.getElementById("text").innerText = postText || "";
-    document.getElementById("sub").innerText  = subText || "";
-
-    if (badgeUrl) {
-      const img = document.getElementById("badgeImg");
-      img.src = badgeUrl;
-      img.style.display = "block";
-      document.getElementById("badge").style.display = "none";
-    }
-  };
-</script>
 </head>
 
 <body>
-  <div id="bg" class="bg"></div>
 
-  <!-- Default elegant floating badge (CSS) -->
-  <div id="badge" class="badge">
-    <div class="badgeDot"></div>
-    <div class="badgeText">New post</div>
+<div class="bg"></div>
+
+<div class="badge">
+  <div class="badgeDot"></div>
+  <div class="badgeText">New post</div>
+</div>
+
+<div class="photo"></div>
+
+<div class="copyWrap">
+  <div class="newpost">New Post!</div>
+
+  <div class="copy">
+    {{text}}
   </div>
 
-  <!-- Optional PNG badge (set via ?badge_url=...) -->
-  <img id="badgeImg" class="badgeImg" alt="New post badge" />
+  <div class="cta">
+    🛒 Shop this design ➔ Link in Bio
+  </div>
+</div>
 
-  <div id="photo" class="photo"></div>
+<div class="spacer"></div>
+<div class="deskneko">@DeskNeko</div>
 
-  <div id="text" class="text"></div>
-  <div id="sub" class="sub"></div>
-
-  <div class="spacer"></div>
-
-  <div class="deskneko">@deskneko</div>
 </body>
 </html>
